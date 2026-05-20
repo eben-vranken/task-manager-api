@@ -8,11 +8,11 @@ import (
 )
 
 type TaskRepository struct {
-	DB *sql.DB
+	db *sql.DB
 }
 
 func (tr TaskRepository) Create(ctx context.Context, task models.Task) (models.Task, error) {
-	execErr := tr.DB.QueryRowContext(ctx, `INSERT INTO tasks 
+	execErr := tr.db.QueryRowContext(ctx, `INSERT INTO tasks 
 	(user_id,
 	 task_status,
 	 task_priority, 
@@ -25,4 +25,10 @@ func (tr TaskRepository) Create(ctx context.Context, task models.Task) (models.T
 	).Scan(&task.ID, &task.CreatedAt, &task.UpdatedAt)
 
 	return task, execErr
+}
+
+func NewTaskRepository(db *sql.DB) *TaskRepository {
+	t := new(TaskRepository)
+	t.db = db
+	return t
 }

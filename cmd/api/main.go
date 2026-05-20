@@ -35,8 +35,8 @@ func main() {
 		log.Panicf("Error when opening database %v\n", err)
 	}
 
-	taskRepository := &repository.TaskRepository{DB: db}
-	taskHandler := &handlers.TaskHandler{TR: taskRepository}
+	taskRepository := repository.NewTaskRepository(db)
+	taskHandler := handlers.NewTaskHandler(taskRepository)
 
 	http.HandleFunc("POST /task", loggingMiddleware(taskHandler.Create))
 

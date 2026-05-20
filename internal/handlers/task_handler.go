@@ -10,7 +10,7 @@ import (
 )
 
 type TaskHandler struct {
-	TR *repository.TaskRepository
+	tr *repository.TaskRepository
 }
 
 func (th *TaskHandler) Create(w http.ResponseWriter, req *http.Request) {
@@ -26,7 +26,7 @@ func (th *TaskHandler) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	createdTask, err := th.TR.Create(req.Context(), task)
+	createdTask, err := th.tr.Create(req.Context(), task)
 
 	if err != nil {
 		log.Print(err)
@@ -43,4 +43,10 @@ func (th *TaskHandler) Create(w http.ResponseWriter, req *http.Request) {
 		log.Print(err)
 		log.Println("500 - Interval server error")
 	}
+}
+
+func NewTaskHandler(tr *repository.TaskRepository) *TaskHandler {
+	t := new(TaskHandler)
+	t.tr = tr
+	return t
 }
