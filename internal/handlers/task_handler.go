@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
@@ -125,6 +127,12 @@ func (th *TaskHandler) Update(w http.ResponseWriter, req *http.Request) {
 	}
 
 	task, err := th.tr.Update(req.Context(), newTask, req.PathValue("id"))
+
+	if errors.Is(err, sql.ErrNoRows) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("404 - Task not found"))
+		return
+	}
 
 	if err != nil {
 		log.Print(err)

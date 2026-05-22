@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"log"
@@ -136,6 +137,12 @@ func (uh *UserHandler) Update(w http.ResponseWriter, req *http.Request) {
 	}
 
 	newUser, err := uh.ur.Update(req.Context(), user, req.PathValue("id"))
+
+	if errors.Is(err, sql.ErrNoRows) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("404 - User not found"))
+		return
+	}
 
 	if err != nil {
 		log.Print(err)
