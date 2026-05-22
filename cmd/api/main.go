@@ -41,6 +41,7 @@ func main() {
 	http.HandleFunc("POST /task", loggingMiddleware(taskHandler.Create))
 	http.HandleFunc("GET /task", loggingMiddleware(taskHandler.GetAll))
 	http.HandleFunc("GET /task/{id}", loggingMiddleware(taskHandler.GetSpecificById))
+	http.HandleFunc("DELETE /task/{id}", loggingMiddleware(taskHandler.Delete))
 
 	fmt.Println("Listening to port", PORT+"...")
 	log.Fatal(http.ListenAndServe("127.0.0.1:"+PORT, nil))

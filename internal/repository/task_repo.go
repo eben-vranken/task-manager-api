@@ -102,6 +102,12 @@ func (tr TaskRepository) GetSpecificById(ctx context.Context, id string) (*model
 	return &task, row.Err()
 }
 
+func (tr TaskRepository) Delete(ctx context.Context, id string) (sql.Result, error) {
+	result, err := tr.db.ExecContext(ctx, "DELETE FROM tasks WHERE id = $1", id)
+
+	return result, err
+}
+
 func NewTaskRepository(db *sql.DB) *TaskRepository {
 	t := new(TaskRepository)
 	t.db = db

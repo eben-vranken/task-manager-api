@@ -91,6 +91,26 @@ func (th *TaskHandler) GetSpecificById(w http.ResponseWriter, req *http.Request)
 	}
 }
 
+func (th *TaskHandler) Delete(w http.ResponseWriter, req *http.Request) {
+	result, err := th.tr.Delete(req.Context(), req.PathValue("id"))
+
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Internal server error"))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
+	err = json.NewEncoder(w).Encode(result)
+
+	if err != nil {
+		log.Print(err)
+		log.Println("500 - Internal server error")
+	}
+}
+
 func NewTaskHandler(tr *repository.TaskRepository) *TaskHandler {
 	t := new(TaskHandler)
 	t.tr = tr
