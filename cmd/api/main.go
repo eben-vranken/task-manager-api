@@ -39,6 +39,8 @@ func main() {
 	taskHandler := handlers.NewTaskHandler(taskRepository)
 
 	http.HandleFunc("POST /task", loggingMiddleware(taskHandler.Create))
+	http.HandleFunc("GET /task", loggingMiddleware(taskHandler.GetAll))
+	http.HandleFunc("GET /task/{id}", loggingMiddleware(taskHandler.GetSpecificById))
 
 	fmt.Println("Listening to port", PORT+"...")
 	log.Fatal(http.ListenAndServe("127.0.0.1:"+PORT, nil))

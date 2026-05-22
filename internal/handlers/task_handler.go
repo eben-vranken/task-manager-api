@@ -45,6 +45,52 @@ func (th *TaskHandler) Create(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (th *TaskHandler) GetAll(w http.ResponseWriter, req *http.Request) {
+	tasks, err := th.tr.GetAll(req.Context())
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Interval server error"))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(tasks)
+
+	if err != nil {
+		log.Print(err)
+		log.Println("500 - Interval server error")
+	}
+}
+
+func (th *TaskHandler) GetSpecificById(w http.ResponseWriter, req *http.Request) {
+	task, err := th.tr.GetSpecificById(req.Context(), req.PathValue("id"))
+
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Interval server error"))
+		return
+	}
+
+	if *task == (models.Task{}) {
+		log.Print(err)
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("404 - Task not found"))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(task)
+
+	if err != nil {
+		log.Print(err)
+		log.Println("500 - Internal server error")
+	}
+}
+
 func NewTaskHandler(tr *repository.TaskRepository) *TaskHandler {
 	t := new(TaskHandler)
 	t.tr = tr
