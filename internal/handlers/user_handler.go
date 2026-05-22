@@ -92,6 +92,26 @@ func (uh *UserHandler) GetSpecificById(w http.ResponseWriter, req *http.Request)
 	}
 }
 
+func (uh *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
+	result, err := uh.ur.Delete(req.Context(), req.PathValue("id"))
+
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Internal server error"))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
+	err = json.NewEncoder(w).Encode(result)
+
+	if err != nil {
+		log.Print(err)
+		log.Println("500 - Internal server error")
+	}
+}
+
 func NewUserHandler(ur *repository.UserRepository) *UserHandler {
 	t := new(UserHandler)
 	t.ur = ur

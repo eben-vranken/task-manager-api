@@ -71,6 +71,12 @@ func (ur UserRepository) GetSpecificById(ctx context.Context, id string) (*model
 	return &user, err
 }
 
+func (ur UserRepository) Delete(ctx context.Context, id string) (sql.Result, error) {
+	result, err := ur.db.ExecContext(ctx, "DELETE FROM users WHERE id = $1", id)
+
+	return result, err
+}
+
 func NewUserRepository(db *sql.DB) *UserRepository {
 	t := new(UserRepository)
 	t.db = db
