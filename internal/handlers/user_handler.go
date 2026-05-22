@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
 	"github.com/eben-vranken/task-manager-api/internal/models"
 	"github.com/eben-vranken/task-manager-api/internal/repository"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type UserHandler struct {
@@ -94,6 +96,14 @@ func (uh *UserHandler) GetSpecificById(w http.ResponseWriter, req *http.Request)
 
 func (uh *UserHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	result, err := uh.ur.Delete(req.Context(), req.PathValue("id"))
+
+	var constraintError *pgconn.PgError
+	if errors.As(err, &constraintError) {
+		log.Print(err)
+		w.WriteHeader(http.StatusConflict)
+		w.Write([]byte("409 - Cannot delete user since they have tasks assigned to them"))
+		return
+	}
 
 	if err != nil {
 		log.Print(err)
