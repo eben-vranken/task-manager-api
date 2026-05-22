@@ -66,6 +66,32 @@ func (uh *UserHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (uh *UserHandler) GetSpecificById(w http.ResponseWriter, req *http.Request) {
+	user, err := uh.ur.GetSpecificById(req.Context(), req.PathValue("id"))
+
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Internal server error"))
+		return
+	}
+
+	if *user == (models.User{}) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("404 - User not found"))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(user)
+
+	if err != nil {
+		log.Print(err)
+		log.Print("500 - Internal server error")
+	}
+}
+
 func NewUserHandler(ur *repository.UserRepository) *UserHandler {
 	t := new(UserHandler)
 	t.ur = ur

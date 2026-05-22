@@ -47,6 +47,30 @@ func (ur UserRepository) GetAll(ctx context.Context) ([]models.User, error) {
 	return users, rows.Err()
 }
 
+func (ur UserRepository) GetSpecificById(ctx context.Context, id string) (*models.User, error) {
+
+	row, err := ur.db.QueryContext(ctx, "SELECT id, name FROM users WHERE id = $1", id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var user models.User
+	for row.Next() {
+		err := row.Scan(&user.ID, &user.Name)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if row.Err() != nil {
+		return nil, err
+	}
+
+	return &user, err
+}
+
 func NewUserRepository(db *sql.DB) *UserRepository {
 	t := new(UserRepository)
 	t.db = db
