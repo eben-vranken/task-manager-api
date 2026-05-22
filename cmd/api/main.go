@@ -50,7 +50,8 @@ func main() {
 
 	// User Routes
 	http.HandleFunc("POST /user", loggingMiddleware(userHandler.Create))
-	
+	http.HandleFunc("GET /user", loggingMiddleware(userHandler.GetAll))
+
 	fmt.Println("Listening to port", PORT+"...")
 	log.Fatal(http.ListenAndServe("127.0.0.1:"+PORT, nil))
 }

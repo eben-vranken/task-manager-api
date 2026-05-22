@@ -7,7 +7,6 @@ import (
 	"github.com/eben-vranken/task-manager-api/internal/models"
 )
 
-
 type UserRepository struct {
 	db *sql.DB
 }
@@ -17,8 +16,35 @@ func (ur UserRepository) Create(ctx context.Context, user models.User) (models.U
 	VALUES ($1)
 	RETURNING id
 	`, user.Name).Scan(&user.ID)
-	
+
 	return user, err
+}
+
+func (ur UserRepository) GetAll(ctx context.Context) ([]models.User, error) {
+	rows, err := ur.db.QueryContext(ctx, `SELECT id, name FROM users`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var users []models.User
+
+	for rows.Next() {
+		var user models.User
+		err := rows.Scan(&user.ID, &user.Name)
+
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return users, rows.Err()
 }
 
 func NewUserRepository(db *sql.DB) *UserRepository {
