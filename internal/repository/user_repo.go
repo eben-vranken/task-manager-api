@@ -77,6 +77,16 @@ func (ur UserRepository) Delete(ctx context.Context, id string) (sql.Result, err
 	return result, err
 }
 
+func (ur UserRepository) Update(ctx context.Context, user models.User, id string) (*models.User, error) {
+	err := ur.db.QueryRowContext(ctx, "UPDATE users SET name = $2 WHERE id = $1 RETURNING id, name", id, user.Name).Scan(&user.ID, &user.Name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, err
+}
+
 func NewUserRepository(db *sql.DB) *UserRepository {
 	t := new(UserRepository)
 	t.db = db
