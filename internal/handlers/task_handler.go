@@ -111,6 +111,33 @@ func (th *TaskHandler) Delete(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (th *TaskHandler) Update(w http.ResponseWriter, req *http.Request) {
+	var newTask models.Task
+
+	decoder := json.NewDecoder(req.Body)
+
+	err := decoder.Decode(&newTask)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("200 - Bad Request"))
+		return
+	}
+
+	task, err := th.tr.Update(req.Context(), newTask, req.PathValue("id"))
+
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Internal server error"))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(task)
+}
+
 func NewTaskHandler(tr *repository.TaskRepository) *TaskHandler {
 	t := new(TaskHandler)
 	t.tr = tr

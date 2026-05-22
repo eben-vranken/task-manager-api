@@ -108,6 +108,26 @@ func (tr TaskRepository) Delete(ctx context.Context, id string) (sql.Result, err
 	return result, err
 }
 
+func (tr TaskRepository) Update(ctx context.Context, newTask models.Task, id string) (*models.Task, error) {
+	err := tr.db.QueryRowContext(ctx, `UPDATE tasks SET
+	user_id = $2, 
+	task_status = $3,
+	task_priority = $4, 
+	title = $5, 
+	description = $6, 
+	due_date = $7, 
+	updated_at = NOW()
+	WHERE id = $1
+	RETURNING id, user_id, task_status, task_priority, title, description, due_date, created_at, updated_at;`,
+		id, newTask.UserID, newTask.TaskStatus, newTask.TaskPriority, newTask.Title, newTask.Description, newTask.DueDate).Scan(&newTask.ID, &newTask.UserID, &newTask.TaskStatus, &newTask.TaskPriority, &newTask.Title, &newTask.Description, &newTask.DueDate, &newTask.CreatedAt, &newTask.UpdatedAt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &newTask, err
+}
+
 func NewTaskRepository(db *sql.DB) *TaskRepository {
 	t := new(TaskRepository)
 	t.db = db
