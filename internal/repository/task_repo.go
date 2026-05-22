@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/eben-vranken/task-manager-api/internal/models"
 )
@@ -62,8 +61,6 @@ func (tr TaskRepository) GetAll(ctx context.Context) ([]models.Task, error) {
 	if rows.Err() != nil {
 		return nil, rows.Err()
 	}
-
-	fmt.Println(tasks)
 
 	return tasks, rows.Err()
 }

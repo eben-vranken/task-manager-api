@@ -38,11 +38,19 @@ func main() {
 	taskRepository := repository.NewTaskRepository(db)
 	taskHandler := handlers.NewTaskHandler(taskRepository)
 
+	userRepository := repository.NewUserRepository(db)
+	userHandler := handlers.NewUserHandler(userRepository)
+
+	// Task Routes
 	http.HandleFunc("POST /task", loggingMiddleware(taskHandler.Create))
 	http.HandleFunc("GET /task", loggingMiddleware(taskHandler.GetAll))
 	http.HandleFunc("GET /task/{id}", loggingMiddleware(taskHandler.GetSpecificById))
 	http.HandleFunc("DELETE /task/{id}", loggingMiddleware(taskHandler.Delete))
-	http.HandleFunc("PUT /task/{id}", taskHandler.Update)
+	http.HandleFunc("PUT /task/{id}", loggingMiddleware(taskHandler.Update))
+
+	// User Routes
+	http.HandleFunc("POST /user", loggingMiddleware(userHandler.Create))
+	
 	fmt.Println("Listening to port", PORT+"...")
 	log.Fatal(http.ListenAndServe("127.0.0.1:"+PORT, nil))
 }
