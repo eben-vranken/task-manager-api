@@ -53,9 +53,9 @@ func (tr TaskRepository) GetAll(ctx context.Context) ([]models.Task, error) {
 		err := rows.Scan(&task.ID, &task.UserID, &task.TaskStatus, &task.TaskPriority, &task.Title, &task.Description, &task.DueDate, &task.CreatedAt, &task.UpdatedAt)
 		if err != nil {
 			return nil, err
-		} else {
-			tasks = append(tasks, task)
 		}
+
+		tasks = append(tasks, task)
 	}
 
 	if rows.Err() != nil {
